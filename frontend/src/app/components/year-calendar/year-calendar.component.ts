@@ -42,7 +42,7 @@ interface CalendarMonth {
   styleUrls: ['./year-calendar.component.scss']
 })
 export class YearCalendarComponent implements OnInit {
-  currentYear: number = new Date().getFullYear();
+  currentYear: number = 2025;
   months: CalendarMonth[] = [];
   events: Event[] = [];
   loading = false;
@@ -119,12 +119,31 @@ export class YearCalendarComponent implements OnInit {
   }
 
   getEventsForDate(date: Date): Event[] {
-    const dateStr = this.formatDate(date);
-    return this.events.filter(event => {
-      const startDate = new Date(event.startDate);
-      const endDate = new Date(event.endDate || event.startDate);
-      return date >= startDate && date <= endDate;
+    // Parse date strings carefully to avoid timezone issues
+    const parseDate = (dateStr: string): Date => {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    };
+
+    const filteredEvents = this.events.filter(event => {
+      const startDate = parseDate(event.startDate);
+      const endDate = parseDate(event.endDate || event.startDate);
+      
+      // Normalize dates to compare only the date part (not time)
+      const normalizeDate = (d: Date): Date => {
+        const normalized = new Date(d);
+        normalized.setHours(0, 0, 0, 0);
+        return normalized;
+      };
+      
+      const normalizedDate = normalizeDate(date);
+      const normalizedStart = normalizeDate(startDate);
+      const normalizedEnd = normalizeDate(endDate);
+      
+      return normalizedDate >= normalizedStart && normalizedDate <= normalizedEnd;
     });
+    
+    return filteredEvents;
   }
 
   onDayClick(day: CalendarDay): void {
@@ -134,8 +153,9 @@ export class YearCalendarComponent implements OnInit {
         events: day.events,
         mode: 'view'
       },
-      width: '600px',
-      maxWidth: '90vw'
+      width: '650px',
+      maxWidth: '95vw',
+      maxHeight: '90vh'
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
@@ -152,8 +172,9 @@ export class YearCalendarComponent implements OnInit {
         events: [],
         mode: 'create'
       },
-      width: '600px',
-      maxWidth: '90vw'
+      width: '650px',
+      maxWidth: '95vw',
+      maxHeight: '90vh'
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {

@@ -1,0 +1,173 @@
+<div class="events-list-container">
+  <!-- Header -->
+  <mat-toolbar class="events-toolbar">
+    <div class="toolbar-content">
+      <div class="year-navigation">
+        <button mat-icon-button (click)="previousYear()" matTooltip="Previous Year">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <h1 class="year-title">Events {{ currentYear }}</h1>
+        <button mat-icon-button (click)="nextYear()" matTooltip="Next Year">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+      
+      <div class="toolbar-actions">
+        <button mat-button (click)="goToCurrentYear()" matTooltip="Go to Current Year">
+          Today
+        </button>
+        <button mat-raised-button color="primary" (click)="createNewEvent()" matTooltip="Create New Event">
+          <mat-icon>add</mat-icon>
+          New Event
+        </button>
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <!-- Statistics Cards -->
+  <div class="stats-section">
+    <mat-card class="stat-card total">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon>event</mat-icon>
+          <div class="stat-info">
+            <h2>{{ totalEvents }}</h2>
+            <p>Total Events</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card recurring">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon>repeat</mat-icon>
+          <div class="stat-info">
+            <h2>{{ recurringEvents }}</h2>
+            <p>Recurring Events</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card single">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon>event_note</mat-icon>
+          <div class="stat-info">
+            <h2>{{ singleEvents }}</h2>
+            <p>Single Events</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Filter Chips -->
+  <div class="filter-section">
+    <h3>Filter Events</h3>
+    <mat-chip-set>
+      <mat-chip (click)="filterEvents('all')" [highlighted]="filteredEvents.length === totalEvents">
+        All Events ({{ totalEvents }})
+      </mat-chip>
+      <mat-chip (click)="filterEvents('recurring')" [highlighted]="filteredEvents.length === recurringEvents && recurringEvents > 0">
+        Recurring ({{ recurringEvents }})
+      </mat-chip>
+      <mat-chip (click)="filterEvents('single')" [highlighted]="filteredEvents.length === singleEvents && singleEvents > 0">
+        Single ({{ singleEvents }})
+      </mat-chip>
+    </mat-chip-set>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-icon class="loading-spinner">autorenew</mat-icon>
+    <p>Loading events...</p>
+  </div>
+
+  <!-- Events List -->
+  <div class="events-container" *ngIf="!loading">
+    <div *ngIf="filteredEvents.length === 0" class="no-events">
+      <mat-icon>event_busy</mat-icon>
+      <h3>No events found</h3>
+      <p>There are no events for the selected filter.</p>
+      <button mat-raised-button color="primary" (click)="createNewEvent()">
+        <mat-icon>add</mat-icon>
+        Create First Event
+      </button>
+    </div>
+
+    <div class="events-grid" *ngIf="filteredEvents.length > 0">
+      <mat-card *ngFor="let event of filteredEvents" class="event-card">
+        <mat-card-header>
+          <div class="event-color-indicator" [style.background-color]="event.color"></div>
+          <mat-card-title>{{ event.title }}</mat-card-title>
+          <mat-card-subtitle>
+            <div class="event-date">
+              {{ formatDate(event.startDate) }}
+              <span *ngIf="event.endDate && event.endDate !== event.startDate">
+                - {{ formatDate(event.endDate) }}
+              </span>
+            </div>
+          </mat-card-subtitle>
+          <div class="spacer"></div>
+          <button mat-icon-button [matMenuTriggerFor]="eventMenu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #eventMenu="matMenu">
+            <button mat-menu-item (click)="editEvent(event)" [disabled]="event.isRecurringInstance">
+              <mat-icon>edit</mat-icon>
+              <span>Edit</span>
+            </button>
+            <button mat-menu-item (click)="deleteEvent(event)">
+              <mat-icon>delete</mat-icon>
+              <span>Delete</span>
+            </button>
+          </mat-menu>
+        </mat-card-header>
+
+        <mat-card-content>
+          <p *ngIf="event.description" class="event-description">{{ event.description }}</p>
+          
+          <div class="event-details">
+            <div class="detail-item">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ getEventDuration(event) }}</span>
+            </div>
+            
+            <div class="detail-item" *ngIf="event.recurring?.enabled">
+              <mat-icon>repeat</mat-icon>
+              <span>{{ getRecurringText(event) }}</span>
+            </div>
+
+            <div class="detail-item" *ngIf="event.isRecurringInstance">
+              <mat-icon>link</mat-icon>
+              <span>Part of recurring series</span>
+            </div>
+          </div>
+
+          <div class="event-badges">
+            <mat-chip *ngIf="event.recurring?.enabled" class="recurring-badge">
+              <mat-icon>repeat</mat-icon>
+              Recurring
+            </mat-chip>
+            <mat-chip *ngIf="event.isRecurringInstance" class="instance-badge">
+              Instance
+            </mat-chip>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions>
+          <button mat-button (click)="editEvent(event)" [disabled]="event.isRecurringInstance">
+            <mat-icon>edit</mat-icon>
+            Edit
+          </button>
+          <button mat-button color="warn" (click)="deleteEvent(event)">
+            <mat-icon>delete</mat-icon>
+            Delete
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>

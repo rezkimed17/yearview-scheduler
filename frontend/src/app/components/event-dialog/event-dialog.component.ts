@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -80,7 +80,8 @@ export class EventDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private fb: FormBuilder,
     private eventService: EventService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {
     this.mode = data.mode;
     this.events = data.events || [];
@@ -109,11 +110,17 @@ export class EventDialogComponent implements OnInit {
   }
 
   populateForm(event: Event): void {
+    // Parse dates carefully to avoid timezone issues
+    const parseDate = (dateStr: string): Date => {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    };
+
     this.eventForm.patchValue({
       title: event.title,
       description: event.description || '',
-      startDate: new Date(event.startDate),
-      endDate: new Date(event.endDate || event.startDate),
+      startDate: parseDate(event.startDate),
+      endDate: parseDate(event.endDate || event.startDate),
       color: event.color,
       recurringEnabled: event.recurring?.enabled || false,
       recurringType: event.recurring?.type || 'weekly',
@@ -198,16 +205,40 @@ export class EventDialogComponent implements OnInit {
   }
 
   deleteEvent(): void {
-    if (!this.selectedEvent || this.selectedEvent.isRecurringInstance) {
-      this.snackBar.open('Cannot delete recurring event instances directly.', 'Close', { duration: 3000 });
+    if (!this.selectedEvent) {
+      return;
+    }
+
+    // Determine which ID to use for deletion
+    let deleteId = this.selectedEvent.id;
+    let confirmMessage = 'Are you sure you want to delete this event?';
+    let isRecurringSeries = false;
+    
+    if (this.selectedEvent.isRecurringInstance && this.selectedEvent.parentId) {
+      // For recurring instances, delete the parent event (which will remove all instances)
+      deleteId = this.selectedEvent.parentId;
+      confirmMessage = 'This will delete the entire recurring event series. Are you sure?';
+      isRecurringSeries = true;
+    } else if (this.selectedEvent.recurring?.enabled) {
+      // For parent recurring events
+      confirmMessage = 'This will delete the entire recurring event series. Are you sure?';
+      isRecurringSeries = true;
+    }
+
+    // Show confirmation dialog
+    const confirmed = confirm(confirmMessage);
+    if (!confirmed) {
       return;
     }
 
     this.loading = true;
-    this.eventService.deleteEvent(this.selectedEvent.id).subscribe({
+    this.eventService.deleteEvent(deleteId).subscribe({
       next: () => {
         this.loading = false;
-        this.snackBar.open('Event deleted successfully!', 'Close', { duration: 3000 });
+        const message = isRecurringSeries 
+          ? 'Recurring event series deleted successfully!' 
+          : 'Event deleted successfully!';
+        this.snackBar.open(message, 'Close', { duration: 3000 });
         this.dialogRef.close({ refresh: true });
       },
       error: (error) => {
@@ -232,9 +263,14 @@ export class EventDialogComponent implements OnInit {
   }
 
   private formatDate(date: Date): string {
-    return date.getFullYear() + '-' + 
-           String(date.getMonth() + 1).padStart(2, '0') + '-' + 
-           String(date.getDate()).padStart(2, '0');
+    // Use the original date's local values to avoid timezone issues
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    
+    return year + '-' + 
+           String(month).padStart(2, '0') + '-' + 
+           String(day).padStart(2, '0');
   }
 
   get isViewMode(): boolean {

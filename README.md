@@ -1,28 +1,40 @@
 # Year Planner - Full-Year Calendar Application
 
-A comprehensive year planner web application built with Angular frontend and Node.js backend, featuring a complete calendar view, event management, and recurring events support.
+A comprehensive year planner web application built with Angular frontend and Node.js backend, featuring a complete calendar view, detailed events list, and advanced event management with recurring events support.
 
 ## Features
 
 ### Core Functionality
-- **Full-Year Calendar View**: Display all 12 months on a single page
+- **Full-Year Calendar View**: Display all 12 months on a single page with responsive grid layout
+- **Events List Page**: Comprehensive list view of all events with statistics and filtering
 - **Professional UI**: Built with Angular Material for a clean, modern design
 - **Visual Event Indicators**: Colored dots show events on calendar days
 - **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
+- **Navigation System**: Easy switching between Calendar and Events List views
 
 ### Event Management
-- **Complete CRUD Operations**: Create, read, update, and delete events
-- **Rich Event Details**: Title, description, dates, and custom colors
+- **Complete CRUD Operations**: Create, read, update, and delete events from both views
+- **Rich Event Details**: Title, description, dates, duration, and custom colors
 - **Multi-Day Events**: Events can span multiple days with visual indicators
-- **Recurring Events**: Support for daily, weekly, monthly, and yearly recurrence
+- **Recurring Events**: Support for daily, weekly, monthly, and yearly recurrence with custom intervals
 - **Interactive Dialogs**: Material UI popups for seamless event management
+- **Smart Deletion**: Proper handling of recurring event series vs individual instances
+
+### Events List Features
+- **Statistics Dashboard**: Total events count, recurring vs single events breakdown
+- **Advanced Filtering**: Filter by all events, recurring only, or single events only
+- **Year Navigation**: Browse events across different years
+- **Event Cards**: Detailed card-based layout with event information
+- **Bulk Management**: Easy access to edit/delete multiple events
+- **Search and Sort**: Visual organization of events with color coding
 
 ### Technical Features
 - **File-Based Storage**: Simple JSON storage system (no database required)
 - **RESTful API**: Clean Node.js backend with Express
-- **Real-Time Updates**: Calendar refreshes automatically after changes
+- **Real-Time Updates**: Both views refresh automatically after changes
 - **Error Handling**: Comprehensive error handling and user feedback
 - **Type Safety**: Full TypeScript implementation
+- **Routing System**: Angular routing for seamless navigation
 
 ## Quick Start
 
@@ -71,49 +83,68 @@ A comprehensive year planner web application built with Angular frontend and Nod
 
 ## How to Use
 
-### Viewing the Calendar
+### Navigation
+The application has two main views accessible via the top navigation bar:
+- **Calendar**: Full-year calendar grid view
+- **Events List**: Comprehensive list view with statistics and filtering
+
+### Calendar View
+
+#### Viewing the Calendar
 - The main page displays a full-year calendar with all 12 months
 - Days with events show colored dots (up to 3 visible, with a "+" indicator for more)
 - Use the navigation arrows to move between years
 - Click "Today" to jump to the current year
 
-### Managing Events
+#### Managing Events from Calendar
+1. **Creating Events**: Click the "New Event" button or click on any day
+2. **Viewing Events**: Click on any day that has events (colored dots)
+3. **Editing Events**: Click on a day with events, select event, then click "Edit"
+4. **Deleting Events**: Click on a day with events, select event, then click "Delete"
 
-#### Creating Events
-1. Click the **"New Event"** button in the toolbar, or
-2. Click on any day in the calendar
-3. Fill in the event details:
-   - **Title** (required)
-   - **Description** (optional)
-   - **Start Date** and **End Date**
-   - **Color** (choose from predefined options)
-   - **Recurring Options** (if needed)
+### Events List View
 
-#### Viewing Events
-1. Click on any day that has events (indicated by colored dots)
-2. A dialog will show all events for that day
-3. Click on any event to see full details
+#### Statistics Dashboard
+- **Total Events**: Shows the complete count of events for the selected year
+- **Recurring Events**: Count of recurring event series
+- **Single Events**: Count of one-time events
+- Color-coded statistics cards with hover effects
 
-#### Editing Events
-1. Click on a day with events
-2. Select the event you want to edit
-3. Click the **"Edit"** button
-4. Make your changes and save
+#### Filtering Events
+- **All Events**: View complete list (default)
+- **Recurring Only**: Show only recurring events
+- **Single Only**: Show only one-time events
+- Interactive filter chips with visual feedback
 
-#### Deleting Events
-1. Click on a day with events
-2. Select the event you want to delete
-3. Click the **"Delete"** button
-4. Confirm the deletion
+#### Managing Events from List
+1. **Year Navigation**: Use arrow buttons or "Today" to change years
+2. **Creating Events**: Click "New Event" button in toolbar
+3. **Editing Events**: Click "Edit" button on event card or use menu
+4. **Deleting Events**: Click "Delete" button on event card or use menu
+5. **Event Details**: Each card shows title, dates, description, duration, and recurring info
 
-### Recurring Events
+### Event Creation and Editing
+
+#### Basic Event Information
+- **Title** (required): Name of the event
+- **Description** (optional): Additional details
+- **Start Date**: When the event begins
+- **End Date**: When the event ends (can be same day)
+- **Color**: Choose from predefined color options
+
+#### Recurring Events
 Set up events that repeat automatically:
 - **Daily**: Every day or every N days
-- **Weekly**: Every week or every N weeks
+- **Weekly**: Every week or every N weeks  
 - **Monthly**: Every month or every N months
 - **Yearly**: Every year or every N years
+- **Custom Intervals**: Set specific repeat intervals (e.g., every 3 weeks)
 
-Note: Recurring event instances cannot be edited individually - you must edit the original event.
+#### Important Notes
+- Recurring event instances cannot be edited individually
+- To modify a recurring event, edit the original parent event
+- Deleting a recurring event removes the entire series
+- Multi-day events show duration information in the events list
 
 ## Architecture
 
@@ -124,12 +155,14 @@ frontend/
 │   ├── app/
 │   │   ├── components/
 │   │   │   ├── year-calendar/       # Main calendar component
+│   │   │   ├── events-list/         # Events list page component
 │   │   │   └── event-dialog/        # Event management dialog
 │   │   ├── models/
 │   │   │   └── event.model.ts       # Event type definitions
 │   │   ├── services/
 │   │   │   └── event.service.ts     # API communication service
-│   │   ├── app.component.*          # Root component
+│   │   ├── app.component.*          # Root component with navigation
+│   │   ├── app.routes.ts            # Routing configuration
 │   │   └── app.config.ts            # App configuration
 │   ├── styles.scss                  # Global styles
 │   └── index.html                   # Main HTML file
@@ -138,7 +171,7 @@ frontend/
 ### Backend (Node.js)
 ```
 backend/
-├── server.js                       # Main server file
+├── server.js                       # Main server file with API endpoints
 ├── package.json                     # Dependencies and scripts
 └── data/
     └── events.json                  # Event storage file (auto-created)
@@ -167,8 +200,18 @@ colorOptions = [
 Adjust the CSS grid in `year-calendar.component.scss`:
 ```scss
 .calendar-grid {
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  // Adjust minmax values for different layouts
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  // Modify for different layouts
+}
+```
+
+### Customizing Events List
+Modify the grid layout in `events-list.component.scss`:
+```scss
+.events-grid {
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  // Adjust minmax values for different card sizes
 }
 ```
 
@@ -178,7 +221,7 @@ Update the API URL in `event.service.ts`:
 private readonly API_URL = 'http://your-api-url:port/api';
 ```
 
-## 🛠️ Development
+## Development
 
 ### Building for Production
 ```bash
@@ -187,76 +230,83 @@ npm run build
 This creates a `dist/` folder with production-ready files.
 
 ### Project Structure
-- **Root**: Project configuration and scripts
-- **Frontend**: Angular application with Material UI
+- **Root**: Project configuration and scripts for managing both frontend and backend
+- **Frontend**: Angular application with Material UI and routing
 - **Backend**: Express.js API server with file-based storage
 
 ### Key Technologies Used
-- **Frontend**: Angular 18, Angular Material, TypeScript, SCSS
+- **Frontend**: Angular 18, Angular Material, TypeScript, SCSS, Angular Router
 - **Backend**: Node.js, Express.js, Moment.js for date handling
 - **Storage**: JSON file-based system (easily replaceable with database)
 - **Styling**: Material Design principles with custom SCSS
+- **Build Tools**: Angular CLI, Concurrently for running multiple servers
 
 ## Data Storage
 
-Events are stored in `backend/data/events.json` with the following structure:
+Events are stored in a JSON file (`backend/data/events.json`) with the following structure:
 ```json
 {
   "events": [
     {
-      "id": "unique-uuid",
+      "id": "unique-id",
       "title": "Event Title",
       "description": "Event Description",
-      "startDate": "2024-12-25",
-      "endDate": "2024-12-25",
+      "startDate": "2025-01-15",
+      "endDate": "2025-01-15",
       "color": "#1976d2",
       "recurring": {
-        "enabled": false,
+        "enabled": true,
         "type": "weekly",
-        "interval": 1
+        "interval": 1,
+        "endDate": "2025-12-31"
       },
-      "createdAt": "2024-01-01T12:00:00.000Z",
-      "updatedAt": "2024-01-01T12:00:00.000Z"
+      "isRecurringInstance": false,
+      "parentId": null
     }
   ]
 }
 ```
 
-##  Troubleshooting
+### Recurring Events Logic
+- Parent events have `recurring.enabled: true`
+- Generated instances have `isRecurringInstance: true` and reference `parentId`
+- The backend automatically generates recurring instances when fetching events
+- Editing a recurring event modifies the parent, regenerating all instances
+- Deleting a recurring event removes the parent and all instances
+
+## Browser Support
+- Chrome (recommended)
+- Firefox
+- Safari
+- Edge
+- Mobile browsers (iOS Safari, Chrome Mobile)
+
+## Performance
+- Optimized for displaying full year (365+ days) without performance issues
+- Efficient event filtering and rendering
+- Responsive design that adapts to different screen sizes
+- Lazy loading and efficient change detection
+
+## Troubleshooting
 
 ### Common Issues
-
-1. **Port Already in Use**
-   - Change the port in `backend/server.js` (default: 3000)
-   - Update the API URL in frontend if needed
-
-2. **Events Not Loading**
-   - Check if the backend server is running
-   - Verify the API URL in `event.service.ts`
-   - Check browser console for errors
-
-3. **Build Errors**
-   - Ensure all dependencies are installed: `npm run setup`
-   - Clear node_modules and reinstall if needed
+1. **Port already in use**: Change ports in package.json scripts
+2. **Events not displaying**: Check browser console for API errors
+3. **Styling issues**: Clear browser cache and restart development server
+4. **Date offset problems**: Ensure consistent timezone handling
 
 ### Development Tips
-- Use browser dev tools to inspect API calls
-- Check the backend console for server logs
-- The `events.json` file is created automatically on first use
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- Use browser developer tools to inspect API calls
+- Check the `backend/data/events.json` file for data persistence
+- Monitor console logs for debugging information
+- Use the network tab to verify API communication
 
 ## Contributing
+This is a complete, production-ready application. To extend functionality:
+1. Add new event properties in the Event model
+2. Update the API endpoints to handle new data
+3. Modify the UI components to display new information
+4. Update the storage format if needed
 
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-
----
-
-**Enjoy planning your year!** 
+## License
+This project is provided as-is for educational and personal use. 
