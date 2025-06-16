@@ -1,0 +1,72 @@
+<div class="year-calendar-container">
+  <!-- Header -->
+  <mat-toolbar class="calendar-toolbar">
+    <div class="toolbar-content">
+      <div class="year-navigation">
+        <button mat-icon-button (click)="previousYear()" matTooltip="Previous Year">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <h1 class="year-title">{{ currentYear }}</h1>
+        <button mat-icon-button (click)="nextYear()" matTooltip="Next Year">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+      
+      <div class="toolbar-actions">
+        <button mat-button (click)="goToCurrentYear()" matTooltip="Go to Current Year">
+          Today
+        </button>
+        <button mat-raised-button color="primary" (click)="onCreateEvent()" matTooltip="Create New Event">
+          <mat-icon>add</mat-icon>
+          New Event
+        </button>
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-icon class="loading-spinner">autorenew</mat-icon>
+    <p>Loading events...</p>
+  </div>
+
+  <!-- Calendar Grid -->
+  <div class="calendar-grid" *ngIf="!loading">
+    <mat-card *ngFor="let month of months" class="month-card">
+      <!-- Month Header -->
+      <mat-card-header class="month-header">
+        <mat-card-title>{{ month.name }}</mat-card-title>
+      </mat-card-header>
+
+      <!-- Days of Week Header -->
+      <div class="weekdays-header">
+        <div *ngFor="let day of weekDays" class="weekday">{{ day }}</div>
+      </div>
+
+      <!-- Calendar Days -->
+      <div class="days-grid">
+        <div 
+          *ngFor="let day of month.days" 
+          class="day-cell"
+          [class.other-month]="!day.isCurrentMonth"
+          [class.today]="day.isToday"
+          [class.has-events]="day.events.length > 0"
+          (click)="onDayClick(day)"
+          [matTooltip]="day.events.length > 0 ? day.events.length + ' event(s)' : ''"
+        >
+          <span class="day-number">{{ day.dayNumber }}</span>
+          
+          <!-- Event Indicators -->
+          <div class="event-indicators" *ngIf="day.events.length > 0">
+            <div 
+              *ngFor="let color of getEventDots(day.events)" 
+              class="event-dot"
+              [style.background-color]="color"
+            ></div>
+            <div *ngIf="hasMoreEvents(day.events)" class="more-events">+</div>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</div> 

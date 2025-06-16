@@ -1,0 +1,20 @@
+{
+  "name": "yearview-scheduler",
+  "version": "1.0.0",
+  "description": "A comprehensive year planner with Angular frontend and Node.js backend",
+  "scripts": {
+    "install-frontend": "cd frontend && npm install",
+    "install-backend": "cd backend && npm install",
+    "setup": "npm run install-frontend && npm run install-backend",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && npm start",
+    "build": "cd frontend && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "keywords": ["angular", "nodejs", "calendar", "planner", "scheduler"],
+  "author": "",
+  "license": "MIT"
+} 

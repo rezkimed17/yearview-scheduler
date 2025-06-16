@@ -1,0 +1,185 @@
+<div class="event-dialog">
+  <!-- Dialog Header -->
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <span *ngIf="mode === 'create'">Create New Event</span>
+      <span *ngIf="mode === 'edit' && selectedEvent">Edit Event</span>
+      <span *ngIf="mode === 'view'">{{ formattedDate }}</span>
+    </h2>
+    <button mat-icon-button mat-dialog-close>
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <!-- View Mode: Event List -->
+    <div *ngIf="isViewMode && hasEvents" class="events-list">
+      <mat-list>
+        <mat-list-item 
+          *ngFor="let event of events; let i = index" 
+          (click)="selectEvent(event)"
+          [class.selected]="selectedEvent?.id === event.id"
+        >
+          <div matListItemLine class="event-item">
+            <div class="event-color-indicator" [style.background-color]="event.color"></div>
+            <div class="event-details">
+              <h4>{{ event.title }}</h4>
+              <p *ngIf="event.description">{{ event.description }}</p>
+              <span class="event-time">
+                {{ event.startDate | date:'shortDate' }}
+                <span *ngIf="event.endDate && event.endDate !== event.startDate">
+                  - {{ event.endDate | date:'shortDate' }}
+                </span>
+              </span>
+              <span *ngIf="event.recurring?.enabled" class="recurring-badge">
+                <mat-icon>repeat</mat-icon>
+                {{ event.recurring?.type }}
+              </span>
+            </div>
+          </div>
+          <button mat-icon-button (click)="$event.stopPropagation(); selectEvent(event)">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </mat-list-item>
+      </mat-list>
+    </div>
+
+    <!-- View Mode: No Events -->
+    <div *ngIf="isViewMode && !hasEvents" class="no-events">
+      <mat-icon>event_note</mat-icon>
+      <p>No events on this day</p>
+    </div>
+
+    <!-- View Mode: Selected Event Details -->
+    <div *ngIf="isViewMode && selectedEvent" class="event-details-view">
+      <mat-divider></mat-divider>
+      <div class="event-header">
+        <div class="event-color-indicator" [style.background-color]="selectedEvent.color"></div>
+        <h3>{{ selectedEvent.title }}</h3>
+      </div>
+      
+      <div class="event-info">
+        <p *ngIf="selectedEvent.description"><strong>Description:</strong> {{ selectedEvent.description }}</p>
+        <p><strong>Date:</strong> 
+          {{ selectedEvent.startDate | date:'fullDate' }}
+          <span *ngIf="selectedEvent.endDate && selectedEvent.endDate !== selectedEvent.startDate">
+            - {{ selectedEvent.endDate | date:'fullDate' }}
+          </span>
+        </p>
+        <p *ngIf="selectedEvent.recurring?.enabled">
+          <strong>Recurring:</strong> {{ selectedEvent.recurring?.type | titlecase }}
+          <span *ngIf="selectedEvent.recurring && selectedEvent.recurring.interval > 1">
+            (every {{ selectedEvent.recurring.interval }} {{ selectedEvent.recurring.type }}s)
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Edit Mode: Event Form -->
+    <form *ngIf="isEditMode" [formGroup]="eventForm" class="event-form">
+      <!-- Title -->
+      <mat-form-field appearance="outline">
+        <mat-label>Event Title</mat-label>
+        <input matInput formControlName="title" placeholder="Enter event title">
+        <mat-error *ngIf="eventForm.get('title')?.invalid && eventForm.get('title')?.touched">
+          Title is required
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Description -->
+      <mat-form-field appearance="outline">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="3" placeholder="Enter event description"></textarea>
+      </mat-form-field>
+
+      <!-- Dates -->
+      <div class="date-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Start Date</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>End Date</mat-label>
+          <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <!-- Color -->
+      <mat-form-field appearance="outline">
+        <mat-label>Color</mat-label>
+        <mat-select formControlName="color">
+          <mat-option *ngFor="let color of colorOptions" [value]="color.value">
+            <div class="color-option">
+              <div class="color-preview" [style.background-color]="color.value"></div>
+              {{ color.name }}
+            </div>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Recurring Options -->
+      <div class="recurring-section">
+        <mat-checkbox formControlName="recurringEnabled">
+          Make this a recurring event
+        </mat-checkbox>
+
+        <div *ngIf="eventForm.get('recurringEnabled')?.value" class="recurring-options">
+          <div class="recurring-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Repeat</mat-label>
+              <mat-select formControlName="recurringType">
+                <mat-option *ngFor="let type of recurringTypes" [value]="type.value">
+                  {{ type.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Every</mat-label>
+              <input matInput type="number" formControlName="recurringInterval" min="1" max="365">
+              <span matSuffix>{{ eventForm.get('recurringType')?.value }}(s)</span>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <!-- Dialog Actions -->
+  <mat-dialog-actions class="dialog-actions">
+    <!-- View Mode Actions -->
+    <div *ngIf="isViewMode" class="view-actions">
+      <button mat-button (click)="createNewEvent()">
+        <mat-icon>add</mat-icon>
+        New Event
+      </button>
+      
+      <div *ngIf="selectedEvent" class="selected-event-actions">
+        <button mat-button (click)="switchToEditMode()" [disabled]="selectedEvent.isRecurringInstance">
+          <mat-icon>edit</mat-icon>
+          Edit
+        </button>
+        <button mat-button color="warn" (click)="deleteEvent()" [disabled]="selectedEvent.isRecurringInstance || loading">
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      </div>
+    </div>
+
+    <!-- Edit Mode Actions -->
+    <div *ngIf="isEditMode" class="edit-actions">
+      <button mat-button (click)="switchToViewMode()" *ngIf="selectedEvent">Cancel</button>
+      <button mat-button (click)="cancel()" *ngIf="!selectedEvent">Cancel</button>
+      <button mat-raised-button color="primary" (click)="saveEvent()" [disabled]="loading || eventForm.invalid">
+        <mat-icon *ngIf="loading">hourglass_empty</mat-icon>
+        <mat-icon *ngIf="!loading">save</mat-icon>
+        {{ selectedEvent ? 'Update' : 'Create' }}
+      </button>
+    </div>
+  </mat-dialog-actions>
+</div> 

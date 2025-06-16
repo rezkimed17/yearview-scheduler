@@ -1,0 +1,64 @@
+{
+  "events": [
+    {
+      "id": "fdf24fa5-f2a4-489d-afd9-3a7659731bd2",
+      "title": "Race",
+      "description": "This is race day",
+      "startDate": "2025-06-15",
+      "endDate": "2025-06-15",
+      "color": "#388e3c",
+      "recurring": {
+        "enabled": false,
+        "type": "weekly",
+        "interval": 1
+      },
+      "createdAt": "2025-06-16T00:02:14.101Z",
+      "updatedAt": "2025-06-16T00:02:14.101Z"
+    },
+    {
+      "id": "efdc7bac-0550-45e6-80af-2ac611fbbb84",
+      "title": "Race Day",
+      "description": "test",
+      "startDate": "2025-07-01",
+      "endDate": "2025-07-01",
+      "color": "#f57c00",
+      "recurring": {
+        "enabled": false,
+        "type": "weekly",
+        "interval": 1
+      },
+      "createdAt": "2025-06-16T00:02:34.219Z",
+      "updatedAt": "2025-06-16T00:02:34.219Z"
+    },
+    {
+      "id": "558198e8-b06c-4b9a-a376-221959b89c2d",
+      "title": "test",
+      "description": "test",
+      "startDate": "2025-06-15",
+      "endDate": "2025-06-15",
+      "color": "#1976d2",
+      "recurring": {
+        "enabled": false,
+        "type": "weekly",
+        "interval": 1
+      },
+      "createdAt": "2025-06-16T00:03:17.372Z",
+      "updatedAt": "2025-06-16T00:03:17.372Z"
+    },
+    {
+      "id": "fe097f17-d983-46a0-9e03-3df56cd54d33",
+      "title": "test",
+      "description": "trest",
+      "startDate": "2025-06-15",
+      "endDate": "2025-06-15",
+      "color": "#1976d2",
+      "recurring": {
+        "enabled": false,
+        "type": "weekly",
+        "interval": 1
+      },
+      "createdAt": "2025-06-16T00:03:55.336Z",
+      "updatedAt": "2025-06-16T00:03:55.336Z"
+    }
+  ]
+}
