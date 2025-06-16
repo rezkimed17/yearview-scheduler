@@ -16,6 +16,9 @@
           <mat-icon>list</mat-icon>
           Events List
         </a>
+        <button mat-icon-button (click)="toggleTheme()" [matTooltip]="(isDarkMode$ | async) ? 'Switch to Light Mode' : 'Switch to Dark Mode'" class="theme-toggle">
+          <mat-icon>{{ (isDarkMode$ | async) ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        </button>
       </div>
     </div>
   </nav>

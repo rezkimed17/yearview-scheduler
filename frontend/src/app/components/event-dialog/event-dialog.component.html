@@ -31,10 +31,6 @@
                   - {{ event.endDate | date:'shortDate' }}
                 </span>
               </span>
-              <span *ngIf="event.recurring?.enabled" class="recurring-badge">
-                <mat-icon>repeat</mat-icon>
-                {{ event.recurring?.type }}
-              </span>
             </div>
           </div>
         </mat-list-item>
@@ -63,12 +59,7 @@
             - {{ selectedEvent.endDate | date:'fullDate' }}
           </span>
         </p>
-        <p *ngIf="selectedEvent.recurring?.enabled">
-          <strong>Recurring:</strong> {{ selectedEvent.recurring?.type | titlecase }}
-          <span *ngIf="selectedEvent.recurring && selectedEvent.recurring.interval > 1">
-            (every {{ selectedEvent.recurring.interval }} {{ selectedEvent.recurring.type }}s)
-          </span>
-        </p>
+
       </div>
     </div>
 
@@ -119,31 +110,7 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- Recurring Options -->
-      <div class="recurring-section">
-        <mat-checkbox formControlName="recurringEnabled">
-          Make this a recurring event
-        </mat-checkbox>
 
-        <div *ngIf="eventForm.get('recurringEnabled')?.value" class="recurring-options">
-          <div class="recurring-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Repeat</mat-label>
-              <mat-select formControlName="recurringType">
-                <mat-option *ngFor="let type of recurringTypes" [value]="type.value">
-                  {{ type.name }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Every</mat-label>
-              <input matInput type="number" formControlName="recurringInterval" min="1" max="365">
-              <span matSuffix>{{ eventForm.get('recurringType')?.value }}(s)</span>
-            </mat-form-field>
-          </div>
-        </div>
-      </div>
     </form>
   </mat-dialog-content>
 
@@ -157,7 +124,7 @@
       </button>
 
       <div *ngIf="selectedEvent" class="selected-event-actions">
-        <button mat-button (click)="switchToEditMode()" [disabled]="selectedEvent.isRecurringInstance">
+        <button mat-button (click)="switchToEditMode()">
           <mat-icon>edit</mat-icon>
           Edit
         </button>

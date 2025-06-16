@@ -7,13 +7,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { EventService } from '../../services/event.service';
@@ -38,13 +35,10 @@ interface DialogData {
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatCheckboxModule,
     MatSelectModule,
     MatIconModule,
     MatListModule,
     MatDividerModule,
-    MatToolbarModule,
-    MatMenuModule,
     MatSnackBarModule
   ],
   templateUrl: './event-dialog.component.html',
@@ -68,13 +62,6 @@ export class EventDialogComponent implements OnInit {
     { name: 'Indigo', value: '#303f9f' }
   ];
 
-  recurringTypes = [
-    { name: 'Daily', value: 'daily' },
-    { name: 'Weekly', value: 'weekly' },
-    { name: 'Monthly', value: 'monthly' },
-    { name: 'Yearly', value: 'yearly' }
-  ];
-
   constructor(
     private dialogRef: MatDialogRef<EventDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
@@ -92,10 +79,7 @@ export class EventDialogComponent implements OnInit {
       description: [''],
       startDate: [data.date || new Date(), Validators.required],
       endDate: [data.date || new Date()],
-      color: ['#1976d2', Validators.required],
-      recurringEnabled: [false],
-      recurringType: ['weekly'],
-      recurringInterval: [1, [Validators.min(1), Validators.max(365)]]
+      color: ['#1976d2', Validators.required]
     });
   }
 
@@ -121,10 +105,7 @@ export class EventDialogComponent implements OnInit {
       description: event.description || '',
       startDate: parseDate(event.startDate),
       endDate: parseDate(event.endDate || event.startDate),
-      color: event.color,
-      recurringEnabled: event.recurring?.enabled || false,
-      recurringType: event.recurring?.type || 'weekly',
-      recurringInterval: event.recurring?.interval || 1
+      color: event.color
     });
   }
 
@@ -152,10 +133,7 @@ export class EventDialogComponent implements OnInit {
       description: '',
       startDate: this.data.date || new Date(),
       endDate: this.data.date || new Date(),
-      color: '#1976d2',
-      recurringEnabled: false,
-      recurringType: 'weekly',
-      recurringInterval: 1
+      color: '#1976d2'
     });
     this.mode = 'edit';
   }
@@ -174,15 +152,10 @@ export class EventDialogComponent implements OnInit {
       description: formValue.description,
       startDate: this.formatDate(formValue.startDate),
       endDate: this.formatDate(formValue.endDate),
-      color: formValue.color,
-      recurring: {
-        enabled: formValue.recurringEnabled,
-        type: formValue.recurringType,
-        interval: formValue.recurringInterval
-      }
+      color: formValue.color
     };
 
-    const saveOperation = this.selectedEvent && !this.selectedEvent.isRecurringInstance
+    const saveOperation = this.selectedEvent
       ? this.eventService.updateEvent(this.selectedEvent.id, eventData)
       : this.eventService.createEvent(eventData);
 
@@ -209,36 +182,16 @@ export class EventDialogComponent implements OnInit {
       return;
     }
 
-    // Determine which ID to use for deletion
-    let deleteId = this.selectedEvent.id;
-    let confirmMessage = 'Are you sure you want to delete this event?';
-    let isRecurringSeries = false;
-    
-    if (this.selectedEvent.isRecurringInstance && this.selectedEvent.parentId) {
-      // For recurring instances, delete the parent event (which will remove all instances)
-      deleteId = this.selectedEvent.parentId;
-      confirmMessage = 'This will delete the entire recurring event series. Are you sure?';
-      isRecurringSeries = true;
-    } else if (this.selectedEvent.recurring?.enabled) {
-      // For parent recurring events
-      confirmMessage = 'This will delete the entire recurring event series. Are you sure?';
-      isRecurringSeries = true;
-    }
-
-    // Show confirmation dialog
-    const confirmed = confirm(confirmMessage);
+    const confirmed = confirm('Are you sure you want to delete this event?');
     if (!confirmed) {
       return;
     }
 
     this.loading = true;
-    this.eventService.deleteEvent(deleteId).subscribe({
+    this.eventService.deleteEvent(this.selectedEvent.id).subscribe({
       next: () => {
         this.loading = false;
-        const message = isRecurringSeries 
-          ? 'Recurring event series deleted successfully!' 
-          : 'Event deleted successfully!';
-        this.snackBar.open(message, 'Close', { duration: 3000 });
+        this.snackBar.open('Event deleted successfully!', 'Close', { duration: 3000 });
         this.dialogRef.close({ refresh: true });
       },
       error: (error) => {

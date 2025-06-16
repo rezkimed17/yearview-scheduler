@@ -3,20 +3,11 @@
   <mat-toolbar class="events-toolbar">
     <div class="toolbar-content">
       <div class="year-navigation">
-        <button mat-icon-button (click)="previousYear()" matTooltip="Previous Year">
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-        <h1 class="year-title">Events {{ currentYear }}</h1>
-        <button mat-icon-button (click)="nextYear()" matTooltip="Next Year">
-          <mat-icon>chevron_right</mat-icon>
-        </button>
+        <h1 class="year-title">Events</h1>
       </div>
       
       <div class="toolbar-actions">
-        <button mat-button (click)="goToCurrentYear()" matTooltip="Go to Current Year">
-          Today
-        </button>
-        <button mat-raised-button color="primary" (click)="createNewEvent()" matTooltip="Create New Event">
+        <button mat-raised-button color="primary" (click)="createNewEvent()">
           <mat-icon>add</mat-icon>
           New Event
         </button>
@@ -38,55 +29,61 @@
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="stat-card recurring">
+    <mat-card class="stat-card upcoming">
       <mat-card-content>
         <div class="stat-content">
-          <mat-icon>repeat</mat-icon>
+          <mat-icon>today</mat-icon>
           <div class="stat-info">
-            <h2>{{ recurringEvents }}</h2>
-            <p>Recurring Events</p>
+            <h2>{{ upcomingEvents }}</h2>
+            <p>Upcoming Events</p>
           </div>
         </div>
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="stat-card single">
+    <mat-card class="stat-card week">
       <mat-card-content>
         <div class="stat-content">
-          <mat-icon>event_note</mat-icon>
+          <mat-icon>date_range</mat-icon>
           <div class="stat-info">
-            <h2>{{ singleEvents }}</h2>
-            <p>Single Events</p>
+            <h2>{{ thisWeekEvents }}</h2>
+            <p>This Week</p>
           </div>
         </div>
       </mat-card-content>
     </mat-card>
   </div>
 
-  <!-- Filter Chips -->
+  <!-- Filter and Sort Section -->
   <div class="filter-section">
-    <h3>Filter Events</h3>
-    <mat-chip-set>
-      <mat-chip (click)="filterEvents('all')" [highlighted]="filteredEvents.length === totalEvents">
-        All Events ({{ totalEvents }})
-      </mat-chip>
-      <mat-chip (click)="filterEvents('recurring')" [highlighted]="filteredEvents.length === recurringEvents && recurringEvents > 0">
-        Recurring ({{ recurringEvents }})
-      </mat-chip>
-      <mat-chip (click)="filterEvents('single')" [highlighted]="filteredEvents.length === singleEvents && singleEvents > 0">
-        Single ({{ singleEvents }})
-      </mat-chip>
-    </mat-chip-set>
-  </div>
-
-  <!-- Loading Indicator -->
-  <div *ngIf="loading" class="loading-container">
-    <mat-icon class="loading-spinner">autorenew</mat-icon>
-    <p>Loading events...</p>
+    <div class="section-header">
+      <div class="filter-controls">
+        <h3>Filter Events</h3>
+        <mat-chip-set>
+          <mat-chip (click)="filterEvents('all')" [highlighted]="currentFilter === 'all'">
+            All Events ({{ totalEvents }})
+          </mat-chip>
+          <mat-chip (click)="filterEvents('upcoming')" [highlighted]="currentFilter === 'upcoming'">
+            Upcoming ({{ upcomingEvents }})
+          </mat-chip>
+          <mat-chip (click)="filterEvents('week')" [highlighted]="currentFilter === 'week'">
+            This Week ({{ thisWeekEvents }})
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+      
+      <div class="sort-controls">
+        <h3>Sort Order</h3>
+        <button mat-raised-button (click)="toggleSort()">
+          <mat-icon>{{ sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+          {{ sortButtonText }}
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Events List -->
-  <div class="events-container" *ngIf="!loading">
+  <div class="events-container">
     <div *ngIf="filteredEvents.length === 0" class="no-events">
       <mat-icon>event_busy</mat-icon>
       <h3>No events found</h3>
@@ -99,15 +96,12 @@
 
     <div class="events-grid" *ngIf="filteredEvents.length > 0">
       <mat-card *ngFor="let event of filteredEvents" class="event-card">
+        <div class="event-color-bar" [style.background-color]="event.color"></div>
         <mat-card-header>
-          <div class="event-color-indicator" [style.background-color]="event.color"></div>
           <mat-card-title>{{ event.title }}</mat-card-title>
           <mat-card-subtitle>
             <div class="event-date">
-              {{ formatDate(event.startDate) }}
-              <span *ngIf="event.endDate && event.endDate !== event.startDate">
-                - {{ formatDate(event.endDate) }}
-              </span>
+              {{ formatEventDateTime(event) }}
             </div>
           </mat-card-subtitle>
           <div class="spacer"></div>
@@ -115,7 +109,7 @@
             <mat-icon>more_vert</mat-icon>
           </button>
           <mat-menu #eventMenu="matMenu">
-            <button mat-menu-item (click)="editEvent(event)" [disabled]="event.isRecurringInstance">
+            <button mat-menu-item (click)="editEvent(event)">
               <mat-icon>edit</mat-icon>
               <span>Edit</span>
             </button>
@@ -134,31 +128,11 @@
               <mat-icon>schedule</mat-icon>
               <span>{{ getEventDuration(event) }}</span>
             </div>
-            
-            <div class="detail-item" *ngIf="event.recurring?.enabled">
-              <mat-icon>repeat</mat-icon>
-              <span>{{ getRecurringText(event) }}</span>
-            </div>
-
-            <div class="detail-item" *ngIf="event.isRecurringInstance">
-              <mat-icon>link</mat-icon>
-              <span>Part of recurring series</span>
-            </div>
-          </div>
-
-          <div class="event-badges">
-            <mat-chip *ngIf="event.recurring?.enabled" class="recurring-badge">
-              <mat-icon>repeat</mat-icon>
-              Recurring
-            </mat-chip>
-            <mat-chip *ngIf="event.isRecurringInstance" class="instance-badge">
-              Instance
-            </mat-chip>
           </div>
         </mat-card-content>
 
         <mat-card-actions>
-          <button mat-button (click)="editEvent(event)" [disabled]="event.isRecurringInstance">
+          <button mat-button (click)="editEvent(event)">
             <mat-icon>edit</mat-icon>
             Edit
           </button>

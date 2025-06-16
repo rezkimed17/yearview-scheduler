@@ -50,59 +50,8 @@ async function writeEvents(events) {
 
 // Generate recurring event instances
 function generateRecurringInstances(event, year) {
-  const instances = [];
-  const startDate = moment(event.startDate);
-  const endDate = event.endDate ? moment(event.endDate) : startDate.clone();
-  
-  if (!event.recurring || !event.recurring.enabled) {
-    return [event];
-  }
-
-  const yearStart = moment(`${year}-01-01`);
-  const yearEnd = moment(`${year}-12-31`);
-  
-  let currentDate = startDate.clone();
-  let instanceCount = 0;
-  const maxInstances = 366; // Safety limit
-
-  while (currentDate.isSameOrBefore(yearEnd) && instanceCount < maxInstances) {
-    if (currentDate.isSameOrAfter(yearStart)) {
-      const duration = endDate.diff(startDate, 'days');
-      const instanceStart = currentDate.clone();
-      const instanceEnd = instanceStart.clone().add(duration, 'days');
-      
-      instances.push({
-        ...event,
-        id: `${event.id}_${currentDate.format('YYYY-MM-DD')}`,
-        startDate: instanceStart.format('YYYY-MM-DD'),
-        endDate: instanceEnd.format('YYYY-MM-DD'),
-        isRecurringInstance: true,
-        parentId: event.id
-      });
-    }
-
-    // Move to next occurrence
-    switch (event.recurring.type) {
-      case 'daily':
-        currentDate.add(event.recurring.interval || 1, 'days');
-        break;
-      case 'weekly':
-        currentDate.add(event.recurring.interval || 1, 'weeks');
-        break;
-      case 'monthly':
-        currentDate.add(event.recurring.interval || 1, 'months');
-        break;
-      case 'yearly':
-        currentDate.add(event.recurring.interval || 1, 'years');
-        break;
-      default:
-        break;
-    }
-    
-    instanceCount++;
-  }
-
-  return instances;
+  // No recurring functionality - just return the original event
+  return [event];
 }
 
 // Routes
@@ -179,7 +128,6 @@ app.post('/api/events', async (req, res) => {
       startDate: eventData.startDate,
       endDate: eventData.endDate || eventData.startDate,
       color: eventData.color || '#1976d2',
-      recurring: eventData.recurring || { enabled: false },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };

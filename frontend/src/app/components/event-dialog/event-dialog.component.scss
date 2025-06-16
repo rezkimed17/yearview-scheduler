@@ -2,6 +2,9 @@
   max-width: 650px;
   min-width: 450px;
   width: 100%;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 
   .dialog-header {
     display: flex;
@@ -12,8 +15,9 @@
 
     h2 {
       margin: 0;
-      color: #1976d2;
+      color: var(--accent-color);
       font-weight: 500;
+      transition: color 0.3s ease;
     }
   }
 
@@ -38,12 +42,12 @@
           padding: 12px 16px !important;
 
           &:hover {
-            background-color: rgba(0,0,0,0.04);
+            background-color: var(--border-color);
           }
 
           &.selected {
-            background-color: rgba(25, 118, 210, 0.1);
-            border-left: 4px solid #1976d2;
+            background-color: rgba(100, 181, 246, 0.1);
+            border-left: 4px solid var(--accent-color);
           }
 
           .event-item {
@@ -71,45 +75,30 @@
                 margin: 0;
                 font-size: 1rem;
                 font-weight: 500;
-                color: #333;
+                color: var(--text-primary);
                 line-height: 1.3;
+                transition: color 0.3s ease;
               }
 
               p {
                 margin: 0;
-                color: #666;
+                color: var(--text-secondary);
                 font-size: 0.9rem;
                 line-height: 1.4;
                 word-wrap: break-word;
+                transition: color 0.3s ease;
               }
 
               .event-time {
                 font-size: 0.85rem;
-                color: #888;
+                color: var(--text-tertiary);
                 margin-top: 4px;
                 display: block;
                 white-space: nowrap;
+                transition: color 0.3s ease;
               }
 
-              .recurring-badge {
-                display: inline-flex;
-                align-items: center;
-                gap: 4px;
-                background-color: rgba(25, 118, 210, 0.1);
-                color: #1976d2;
-                padding: 2px 8px;
-                border-radius: 12px;
-                font-size: 0.75rem;
-                font-weight: 500;
-                margin-top: 4px;
-                width: fit-content;
 
-                mat-icon {
-                  font-size: 14px;
-                  width: 14px;
-                  height: 14px;
-                }
-              }
             }
           }
         }
@@ -123,8 +112,9 @@
       align-items: center;
       justify-content: center;
       padding: 48px 24px;
-      color: #999;
+      color: var(--text-tertiary);
       text-align: center;
+      transition: color 0.3s ease;
 
       mat-icon {
         font-size: 48px;
@@ -158,27 +148,32 @@
 
         h3 {
           margin: 0;
-          color: #333;
+          color: var(--text-primary);
           font-weight: 500;
+          transition: color 0.3s ease;
         }
       }
 
       .event-info {
         padding: 16px;
-        background-color: #f8f9fa;
+        background-color: var(--bg-tertiary);
         border-radius: 8px;
+        transition: background-color 0.3s ease;
 
         p {
           margin: 0 0 12px 0;
           line-height: 1.5;
+          color: var(--text-secondary);
+          transition: color 0.3s ease;
 
           &:last-child {
             margin-bottom: 0;
           }
 
           strong {
-            color: #333;
+            color: var(--text-primary);
             margin-right: 8px;
+            transition: color 0.3s ease;
           }
         }
       }
@@ -192,6 +187,27 @@
 
       mat-form-field {
         width: 100%;
+        
+        .mat-mdc-form-field-label {
+          color: var(--text-secondary) !important;
+        }
+        
+        .mat-mdc-input-element {
+          color: var(--text-primary) !important;
+        }
+        
+        textarea {
+          color: var(--text-primary) !important;
+        }
+      }
+      
+      mat-checkbox {
+        color: var(--text-primary);
+        transition: color 0.3s ease;
+        
+        .mdc-form-field {
+          color: var(--text-primary) !important;
+        }
       }
 
       .date-row {
@@ -212,40 +228,21 @@
           width: 20px;
           height: 20px;
           border-radius: 50%;
-          border: 2px solid #fff;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+          border: 2px solid var(--card-bg);
+          box-shadow: 0 1px 3px var(--shadow-light);
+          transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
       }
 
-      .recurring-section {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        padding: 16px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        margin-top: 8px;
 
-        .recurring-options {
-          margin-top: 16px;
-
-          .recurring-row {
-            display: flex;
-            gap: 16px;
-
-            mat-form-field {
-              flex: 1;
-            }
-          }
-        }
-      }
     }
   }
 
   .dialog-actions {
     padding: 16px 24px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--border-color);
     margin-top: 24px;
+    transition: border-color 0.3s ease;
 
     .view-actions {
       display: flex;
@@ -269,6 +266,12 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      color: var(--text-primary);
+      transition: color 0.3s ease, background-color 0.3s ease;
+
+      &:not(.mat-mdc-raised-button):hover {
+        background-color: var(--border-color);
+      }
 
       mat-icon {
         font-size: 18px;
@@ -295,10 +298,7 @@
           gap: 12px;
         }
 
-        .recurring-section .recurring-options .recurring-row {
-          flex-direction: column;
-          gap: 12px;
-        }
+
       }
     }
 

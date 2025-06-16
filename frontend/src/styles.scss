@@ -1,6 +1,39 @@
 /* You can add global styles to this file, and also import other style files */
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
+// CSS Custom Properties for theming
+:root {
+  // Light theme colors
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #fafafa;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --card-bg: #ffffff;
+  --toolbar-bg: #ffffff;
+  --accent-color: #1976d2;
+}
+
+// Dark theme colors
+.dark-theme {
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --bg-tertiary: #2d2d2d;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-tertiary: #808080;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --shadow-light: rgba(0, 0, 0, 0.3);
+  --shadow-medium: rgba(0, 0, 0, 0.4);
+  --card-bg: #1e1e1e;
+  --toolbar-bg: #2d2d2d;
+  --accent-color: #64b5f6;
+}
+
 // Global styles
 * {
   box-sizing: border-box;
@@ -14,9 +47,10 @@ html, body {
 }
 
 body {
-  background-color: #f5f5f5;
-  color: #333;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 // Custom scrollbar
@@ -25,16 +59,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--bg-tertiary);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: var(--text-tertiary);
   border-radius: 4px;
   
   &:hover {
-    background: #a8a8a8;
+    background: var(--text-secondary);
   }
 }
 
@@ -44,6 +78,125 @@ body {
   
   .mat-mdc-dialog-surface {
     overflow: visible;
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+// Material components dark mode support
+.dark-theme {
+  .mat-mdc-dialog-surface {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+  }
+  
+  // Form fields
+  .mat-mdc-form-field {
+    --mdc-filled-text-field-container-color: var(--bg-tertiary);
+    --mdc-filled-text-field-label-text-color: var(--text-secondary);
+    --mdc-filled-text-field-input-text-color: var(--text-primary);
+    --mdc-outlined-text-field-label-text-color: var(--text-secondary);
+    --mdc-outlined-text-field-input-text-color: var(--text-primary);
+    --mdc-outlined-text-field-outline-color: var(--border-color);
+    --mdc-outlined-text-field-hover-outline-color: var(--text-secondary);
+    --mdc-outlined-text-field-focus-outline-color: var(--accent-color);
+    
+    .mat-mdc-form-field-label {
+      color: var(--text-secondary) !important;
+    }
+    
+    .mat-mdc-input-element {
+      color: var(--text-primary) !important;
+    }
+    
+    .mat-mdc-form-field-error {
+      color: #f44336 !important;
+    }
+  }
+  
+  // Textarea
+  .mat-mdc-form-field textarea {
+    color: var(--text-primary) !important;
+  }
+  
+  // Checkboxes
+  .mat-mdc-checkbox {
+    --mdc-checkbox-unselected-icon-color: var(--text-secondary);
+    --mdc-checkbox-selected-icon-color: var(--accent-color);
+    
+    .mdc-form-field {
+      color: var(--text-primary) !important;
+    }
+  }
+  
+  // Buttons
+  .mat-mdc-button:not(.mat-mdc-raised-button):not(.mat-mdc-unelevated-button) {
+    color: var(--text-primary) !important;
+    
+    &:hover {
+      background-color: var(--border-color) !important;
+    }
+  }
+  
+  // Datepicker
+  .mat-datepicker-popup {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+  }
+  
+  .mat-calendar {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+  }
+  
+  .mat-calendar-header {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+  }
+  
+  .mat-calendar-body-cell-content {
+    color: var(--text-primary) !important;
+    
+    &:hover {
+      background-color: var(--border-color) !important;
+    }
+  }
+  
+  .mat-calendar-body-selected {
+    background-color: var(--accent-color) !important;
+    color: white !important;
+  }
+  
+  // Select panels
+  .mat-mdc-select-panel {
+    background-color: var(--card-bg) !important;
+  }
+  
+  .mat-mdc-option {
+    color: var(--text-primary) !important;
+    
+    &:hover {
+      background-color: var(--border-color) !important;
+    }
+  }
+  
+  // Menu panels
+  .mat-mdc-menu-panel {
+    background-color: var(--card-bg) !important;
+  }
+  
+  .mat-mdc-menu-item {
+    color: var(--text-primary) !important;
+    
+    &:hover {
+      background-color: var(--border-color) !important;
+    }
+  }
+  
+  // Dividers
+  .mat-divider {
+    border-top-color: var(--border-color) !important;
   }
 }
 
